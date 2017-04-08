@@ -6,7 +6,7 @@ The UartWiFiBoard is designed as asynchronous serial communication via WiFi.
 This board is based on ESP-WROOM-02(esp8266) chip and will be mainly used for the transparent WiFi-serial bridge.  
 For running standalone, the board has a voltage regulator and some user-interfaces.  
 The UartWiFiBoard is an easy way to connect your board wirelessly to the Internet.  
-If you flash [Sample software](Software\UartWiFiBridge) on this repository, the board works as the transparent WiFi-serial bridge.
+If you flash [Sample software](Software/UartWiFiBridge) on this repository, the board works as the transparent WiFi-serial bridge.
 
 ### Some highlights of the UartWiFiBoard:
  1. Main core: ESP-WROOM-02(ESP8266).
