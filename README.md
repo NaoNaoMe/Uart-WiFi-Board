@@ -7,6 +7,7 @@ This board is based on ESP-WROOM-02(esp8266) chip and will be mainly used for th
 For running standalone, the board has a voltage regulator and some user-interfaces.  
 The UartWiFiBoard is an easy way to connect your board wirelessly to the Internet.  
 If you flash [Sample software](Software/UartWiFiBridge) on this repository, the board works as the transparent WiFi-serial bridge.
+I made video that is [how to use UartWiFiBoard](https://youtu.be/4O-hJj3G7K0). You can watch it on Youtube.
 
 ### Some highlights of the UartWiFiBoard:
  1. Main core: ESP-WROOM-02(ESP8266).
