@@ -54,17 +54,21 @@ Hardware Setup
 Attach the Communication shield in your micro-controller board. 
 
 The Arduino UNO.
+
 ![Arduino](mdContents/ArduinoBoard.png)
 
 The Nucleo board.  
 The Nucleo boards need some tricks about smd parts.  
 All you need is that SB13 and SB14 are OFF, SB62 and SB63 are ON.
+
 ![Nucleo](mdContents/NucleoBoard.png)
 
 The FRDM board.
+
 ![FRDM](mdContents/FRDMBoard.png)
 
 Connect the Communication shield to the Uart WiFi Board with the Communication cable like the following figure(E.g. Arduino).
+
 ![Sample](mdContents/UartWiFiBoardwithArduino.png)
 
 
