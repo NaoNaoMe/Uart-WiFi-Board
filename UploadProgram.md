@@ -34,7 +34,7 @@ int serialSpeedIndex = 0;   //9600bps
 
 
 ### Arduino IDE
-Open up [the sample software](Software/UartWiFiBridge) or your own software in the Arduino IDE.  
+Open up [the sample software](https://github.com/NaoNaoMe/Uart-WiFi-Board/tree/with-display/Software/UartWiFiBridge) or your own software in the Arduino IDE.  
 The board selection and programming configuration are in the figure below.  
 ![Settings](mdContents/IDESettings.png)  
 

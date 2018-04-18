@@ -1,7 +1,7 @@
 Uart WiFi Board
 =========
 
-![Uart WiFi Board](mdContents/Uart WiFi Board_1.png)  
+![Uart WiFi Board](mdContents/UartWiFiBoard_1.png)  
 The Uart WiFi Board designed as the transparent WiFi-serial bridge.  
 There are some updates from the former Uart WiFi Board.  
  - The 128x32 pixels SSD1306 OLED display
@@ -39,7 +39,7 @@ Repository Contents
 
 Description(Pin Interfaces)
 -------------------
-![TopView](mdContents/Uart WiFi Board_2.png)
+![TopView](mdContents/UartWiFiBoard_2.png)
 
 ### CN1(Primarily) Pin Descriptions:
 This connector is the supply voltage.
