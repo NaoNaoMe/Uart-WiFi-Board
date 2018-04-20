@@ -10,7 +10,7 @@ You will need the following items for uploading program.
  - Arduino or Arduino form-factor board
  - [Communication Shield](https://github.com/NaoNaoMe/Communication-Shield)
  - [Communication cable](https://github.com/NaoNaoMe/Communication-Shield/tree/master/Cables)
- - TeraTerm
+ - PuTTY
 
 
 
@@ -78,11 +78,14 @@ Communication with your board
 Press the SW1 button to turn on the Uart WiFi Board.  
 The Uart WiFi Board is started, you can check SSID, IP address and baud rate on the display by pressing SW3 button.  
 
-Execute TeraTerm to start the application and type the IP address of the Uart WiFi Board in the Host Name field.
+Execute PuTTY to start the application and type the IP address of the Uart WiFi Board in the Host Name field.  
 ![Connection](mdContents/Making_a_Connection.png)
 
-Turn on your board. You can see "Hello World !" in the TeraTerm application.
-When you type numeric character, your board return character like following.
+Turn on your board. You can see "Hello World !" in the PuTTY application.
+When you type a character, your board return a character like following.  
+![Example](mdContents/Example1.gif)
+
+It looks like the cursor acts weird. That's because adding 1 to CR(0x0D) and LF(0x0A), they are changed to SO(0x0E) and VT(0x0B).
 
 
 
