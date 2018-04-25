@@ -7,6 +7,7 @@
 
 #include <ESP8266WiFi.h>
 #include <Wire.h>
+#include <EEPROM.h>
 #include "oled.h"
 
 #define POW_BUTTON_PIN 12   //SW1
@@ -18,7 +19,7 @@
 
 #define SERIAL_ARRAY_SIZE 5
 
-enum BoardCondtion{
+enum BoardCondition{
   CHECK_OLED_DEVICE = 0,
   BOARD_OPENING,
   WIFI_CONNECTION_WAITING,
@@ -55,13 +56,14 @@ enum LvState{
 #define RESISTOR_VALUE_H    RESISTOR_VALUE_R1
 #define RESISTOR_VALUE_L    (1/((1/RESISTOR_VALUE_R2) + (1/IMPEDANCE_VALUE_AD)))
 
-#define DIVIDER_RATIO       ((RESISTOR_VALUE_L * 1024) / (RESISTOR_VALUE_H + RESISTOR_VALUE_L))
+#define BATT_GAIN_MAX       (float)100
+#define BATT_GAIN_DEFAULT   (float)((RESISTOR_VALUE_L * 1024) / (RESISTOR_VALUE_H + RESISTOR_VALUE_L))
+#define BATT_GAIN_MIN       (float)80
 
-#define CALC_BATT_VOLTAGE(ad) (ad / DIVIDER_RATIO)
-#define CALC_BATT_AD(volt)    (volt * DIVIDER_RATIO)
+#define LV_DETECT_VOLTAGE     3.5f    // Low voltage value(3.5V)
+#define LV_QUIT_VOLTAGE       3.3f    // Low voltage value(3.3V)
 
-#define LV_DETECT_VOLTAGE_AD  (int)CALC_BATT_AD(3.5)   // Low voltage ad value(3.5V)
-#define LV_QUIT_VOLTAGE_AD    (int)CALC_BATT_AD(3.3)   // Low voltage ad value(3.3V)
+#define CALIBRATION_REF       5.0f    // Battery voltage value(5.0V)
 
 //#define STATIC_IP_ADDR
 
@@ -75,8 +77,8 @@ const String SerialSpeeds[SERIAL_ARRAY_SIZE] = {
 
 OLED OLEDModule;
 
-const char* VersionInfo = "UWB-Sample";
-const char* versionString = "1.0.0";
+const char VersionName[] = "UWB-Sample";
+const char VersionNumber[] = "1.0.0";
 
 const char* ssid = "TestSSID0123";
 const char* password = "TestEncryptionKey0123";
@@ -91,6 +93,8 @@ WiFiServer localServer(23); //Port number must be set
 WiFiClient localClient;
 
 int serialSpeedIndex = 0;
+float BatteryCalcGain = BATT_GAIN_DEFAULT;
+int   BattryVoltAD  = 0;
 float BattryVoltage = 0;
 
 LvState detectLowVoltage(){
@@ -105,10 +109,10 @@ LvState detectLowVoltage(){
     previousMillis = currentMillis;
 
     //check Battery voltage
-    int value = analogRead(A0);
-    BattryVoltage = CALC_BATT_VOLTAGE(value);
+    BattryVoltAD = analogRead(A0);
+    BattryVoltage = (float)BattryVoltAD / BatteryCalcGain;
     
-    if( value < LV_DETECT_VOLTAGE_AD ) {
+    if( BattryVoltage < LV_DETECT_VOLTAGE ) {
       lvDetectCnt++;
     }
     else {
@@ -120,7 +124,7 @@ LvState detectLowVoltage(){
       lowVoltageState = LV_DETECTED;
     }
     
-    if( value < LV_QUIT_VOLTAGE_AD ) {
+    if( BattryVoltage < LV_QUIT_VOLTAGE ) {
       lvQuitCnt++;
     }
     else {
@@ -200,15 +204,23 @@ SwitchState detectRightButton(){
   int val = digitalRead(RIGHT_BUTTON_PIN);
   if(val == LOW)
   {
-    if (currentMillis - previousMillis > 100) {
-      previousMillis = currentMillis;
+    if ((currentMillis - previousMillis) > 1000) {
+      if( swState != SW_LONG_PUSH ){
+        swState = SW_LONG_PUSH;
+        retState = SW_LONG_PUSH;
+        
+      }
+
+    }
+    else if ((currentMillis - previousMillis) > 100) {
       swState = SW_SHORT_PUSH;
+
     }
   }
   else
   {
-    if(swState != SW_NOTHING) {
-      retState = swState;
+    if(swState == SW_SHORT_PUSH) {
+      retState = SW_SHORT_PUSH;
       swState = SW_NOTHING;
       
     }
@@ -304,6 +316,63 @@ bool ScanI2CDevices(byte address) {
   return retflg;
 }
 
+float ReadCalibration(float input) {
+  float output = input;
+  float gain = 0;
+  byte tmp = 0;
+  uint32_t value = 0;
+  
+  tmp = EEPROM.read(3);
+  value |= (uint32_t)tmp;
+  value = (value << 8) & 0xFFFFFF00;
+  tmp = EEPROM.read(2);
+  value |= (uint32_t)tmp;
+  value = (value << 8) & 0xFFFFFF00;
+  tmp = EEPROM.read(1);
+  value |= (uint32_t)tmp;
+  value = (value << 8) & 0xFFFFFF00;
+  tmp = EEPROM.read(0);
+  value |= (uint32_t)tmp;
+
+  if(value != 0xFFFFFFFF) {
+    gain = *(float *)&value;
+    if( (gain <  BATT_GAIN_MAX) &&
+        (gain >= BATT_GAIN_MIN) ) {
+      output = gain;
+    }
+  }
+  
+  return output;
+}
+
+float WriteCalibration(float input) {
+  float output = input;
+  byte tmp = 0;
+  uint32_t value = 0;
+
+  if( (input >= BATT_GAIN_MAX) ||
+      (input <  BATT_GAIN_MIN) ) {
+    return output;
+  }
+  
+  value = *(uint32_t *)&input;
+  tmp = (byte)(value & 0x000000FF); 
+  value = value >> 8;
+  EEPROM.write(0, tmp);
+  tmp = (byte)(value & 0x000000FF); 
+  value = value >> 8;
+  EEPROM.write(1, tmp);
+  tmp = (byte)(value & 0x000000FF); 
+  value = value >> 8;
+  EEPROM.write(2, tmp);
+  tmp = (byte)(value & 0x000000FF); 
+  EEPROM.write(3, tmp);
+
+  EEPROM.commit();
+  
+  return output;
+}
+
 void setup() {
   digitalWrite(REG_CTRL_PIN, HIGH);   // Enable to external voltage regulator.
   digitalWrite(STATUS_LED_PIN, HIGH);
@@ -315,8 +384,6 @@ void setup() {
   pinMode(LEFT_BUTTON_PIN, INPUT);
   pinMode(RIGHT_BUTTON_PIN, INPUT);
 
-  IntervalTiming(0);
-
   Wire.begin();
 
   Serial.begin(SerialSpeeds[serialSpeedIndex].toInt());
@@ -326,10 +393,16 @@ void setup() {
   WiFi.config(staticIP, gateway, subnet);
 #endif
 
+  EEPROM.begin(4);
+
+  BatteryCalcGain = ReadCalibration(BatteryCalcGain);
+
+  IntervalTiming(0);
+
 }
 
 void loop() {
-  static BoardCondtion wifiState = CHECK_OLED_DEVICE;
+  static BoardCondition wifiState = CHECK_OLED_DEVICE;
   String firstColumn;
   String secondColumn;
   
@@ -350,8 +423,8 @@ void loop() {
     break;
     
     case BOARD_OPENING:
-      firstColumn = String(VersionInfo);
-      secondColumn = String(versionString);
+      firstColumn = String(VersionName);
+      secondColumn = String(VersionNumber);
       OLEDModule.drawDisplayWithScrolling(firstColumn, secondColumn, false);
 
       if(IntervalTiming(2000)){
@@ -501,7 +574,7 @@ void displaySequence(void){
         }
         
       }
-      else{
+      else {
         OLEDModule.drawDisplayWithScrolling(firstColumn, secondColumn, true);
         
         if( detectRightButton() == SW_SHORT_PUSH){
@@ -546,6 +619,13 @@ void displaySequence(void){
 
       if( detectLeftButton() == SW_SHORT_PUSH){
         currentProperty = SHOW_CONNECTED_SSID;
+        IntervalTiming(0);
+      }
+      
+      if( detectRightButton() == SW_LONG_PUSH){
+        //VBAT(CN1) Voltage Calibration
+        BatteryCalcGain = (float)BattryVoltAD / CALIBRATION_REF;
+        BatteryCalcGain = WriteCalibration(BatteryCalcGain);
         IntervalTiming(0);
       }
       
