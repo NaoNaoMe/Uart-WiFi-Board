@@ -1,7 +1,11 @@
 Uart WiFi Board
 =========
 
-![Uart WiFi Board](mdContents/UartWiFiBoard_1.png)  
+[![Uart WiFi Board](mdContents/UartWiFiBoard_1.png)  
+*Uart WiFi Board(SKU-3849)*](https://international.switch-science.com/catalog/3849/)
+
+## Uart WiFi Board has been launched! It is available in [the Switch Science store](https://international.switch-science.com/catalog/3849/).
+
 The Uart WiFi Board designed as the transparent WiFi-serial bridge.  
 There are some updates from the former Uart WiFi Board.  
  - The 128x32 pixels SSD1306 OLED display
