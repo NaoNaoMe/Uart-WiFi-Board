@@ -1,25 +1,38 @@
-UartWiFiBoard
+Uart WiFi Board
 =========
 
-![UartWiFiBoard](mdContents/UartWifi_1.png)  
-The UartWiFiBoard is designed as asynchronous serial communication via WiFi.  
-This board is based on ESP-WROOM-02(esp8266) chip and will be mainly used for the transparent WiFi-serial bridge.  
-For running standalone, the board has a voltage regulator and some user-interfaces.  
-The UartWiFiBoard is an easy way to connect your board wirelessly to the Internet.  
-If you flash [Sample software](Software/UartWiFiBridge) on this repository, the board works as the transparent WiFi-serial bridge.
-I made video that is [how to use UartWiFiBoard](https://youtu.be/4O-hJj3G7K0). You can watch it on Youtube.
+[![Uart WiFi Board](mdContents/UartWiFiBoard_1.png)  
+*Uart WiFi Board(SKU-3849)*](https://international.switch-science.com/catalog/3849/)
 
-### Some highlights of the UartWiFiBoard:
+## Uart WiFi Board has been launched! It is available in [the Switch Science store](https://international.switch-science.com/catalog/3849/).
+
+The Uart WiFi Board designed as the transparent WiFi-serial bridge.  
+There are some updates from the former Uart WiFi Board.  
+ - The 128x32 pixels SSD1306 OLED display
+ - The 3 user switches(a switch used as power switch too)
+
+Thanks to add the 128x32 pixels OLED display, we can show IP address, SSID and Serial BaudRate.  
+You don't need remember IP address and Baud Rate, you can see them in the display.
+The Uart WiFi Board can be programmed using the Arduino IDE.
+
+
+### Some highlights of the Uart WiFi Board:
  1. Main core: ESP-WROOM-02(ESP8266).
  2. Voltage regulator(3.3V) with control pin.
  3. Opto-isolated UART interface(Uart interface circuit accepts 3.3V and 5.0V).
- 4. On board WiFi-microcontroller can use following functions.
- 	- LED1 connected to "IO0" H:OFF L:ON(the sample software indicate WiFi status)
- 	- LED2 connected to "IO2" H:OFF L:ON(the sample software indicate UART activity)
- 	- Control voltage regulator's control pin connected to "IO14" H:Enable L:Disabale(normally)
- 	- Voltage detection circuit(for CN1) connected to "TOUT" with forced low switch(SW2)
-		- The sample software use this feature due to prevent battery over-discharge and the switch(SW2) behaves like power-off function.
- 5. Measures 40mm x 50mm x 10mm
+ 4. On board WiFi-controller can use following functions.
+ 	- LED1(IO2), SW1(IO12/POW_ON), SW2(IO16) and SW3(IO13)
+ 	- Control voltage regulator's control pin connected to "IO14" H:Enable L:Disable(normally)
+ 	- Voltage detection circuit(for CN1) connected to "TOUT"
+ 5. Measures 50mm x 60mm x 20mm
+
+
+#### Some highlights of the Sample software:
+ 1. Totally transparent WiFi-serial bridge.
+ 2. IP address, SSID, Serial baud-rate and input-voltage can be displayed.
+ 3. Low voltage detection.
+ 
+Sample software use the [esp8266-oled-ssd1306](https://github.com/ThingPulse/esp8266-oled-ssd1306) library.
 
 
 Repository Contents
@@ -30,35 +43,52 @@ Repository Contents
 
 Description(Pin Interfaces)
 -------------------
-![TopView](mdContents/UartWifi_2.png)
+![TopView](mdContents/UartWiFiBoard_2.png)
 
 ### CN1(Primarily) Pin Descriptions:
-This connector is the supply voltage and input for the voltage detector.
-- **VBAT:** Up to 12.0VDC convert to 3.3VDC.
-- **GND:** GND.
+This connector is the supply voltage.
+
+| Pin | Name | Description                                                  |
+| --- | ---- | ------------------------------------------------------------ |
+| 1   | VBAT | Up to 12.0VDC convert to 3.3VDC                              |
+| 2   | GND  | GND	                                                        |
+
+
 
 ### CN3(Primarily) Pin Descriptions:
-This connector is for Flashing a program to WiFi-microcontroller.
-If you change BOOT MODE, To be selected BOOT MODE before supply voltage.
-- **VCC:** Restrictly 3.3VDC.
-- **TX:** UART TX.
-- **RX:** UART RX.
-- **GND:** GND.
-- **BOOT MODE:** Connected to "IO0" H:Flash boot(normally) L:UART download
+This connector is for uploading software to WiFi-controller.  
+To be selected BOOT MODE before supply voltage when you upload software.
 
-If you are interested in more useful uart module, please see the [General Serial Communication Board](https://github.com/NaoNaoMe/General-Serial-Communication-Board).
+| Pin | Name | Description                                                  |
+| --- | ---- | ------------------------------------------------------------ |
+| 1   | VCC  | 3.3VDC                                                       |
+| 2   | TX   | UART TX	                                                    |
+| 3   | RX   | UART RX	                                                    |
+| 4   | GND  | GND	                                                        |
+| 5   | BOOT | Connected to "IO0" H:Flash boot(normally) L:UART download    |
+
+
 
 ### CN2(Secondary) Pin Descriptions:
-This connector is for your target boart UART-interface.
-- **VIN:** This is the power supply pin with a voltage range of 2.7 to 5.5VDC.
-- **TX:** UART TX(Open collector output).
-- **RX:** UART RX.
-- **GND:** GND.
+This connector is for your target board UART-interface.
+
+| Pin | Name | Description                                                  |
+| --- | ---- | ------------------------------------------------------------ |
+| 1   | VIN  | 2.7VDC to 5.5VDC                                             |
+| 2   | TX   | UART TX(Open collector output)	                            |
+| 3   | RX   | UART RX	                                                    |
+| 4   | GND  | GND	                                                        |
+
 
 
 How to upload program
 -------------------
-See [this page](UploadProgram.md)
+See [this page](UploadProgram.md).
+
+
+How to use the Uart WiFi Board
+-------------------
+An example is [here](Instructions.md).
 
 
 License
